@@ -1,6 +1,15 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { products } from "@/data/site";
 import { cn, focusRing } from "@/lib/cn";
+import {
+  INQUIRY_SAVE_ERROR,
+  fieldErrorsFromZod,
+  inquiryInterests,
+  inquirySchema,
+  type InquiryFieldErrors,
+  type InquiryInput,
+  type NotifyStatus,
+} from "@/lib/inquiry/schema";
+import { submitInquiry } from "@/lib/inquiry/submit";
 
 type Fields = {
   name: string;
@@ -10,42 +19,40 @@ type Fields = {
   note: string;
 };
 
-type Errors = Partial<Record<keyof Fields, string>>;
+type Saved = InquiryInput & { id: number; notify: NotifyStatus };
 
 const empty: Fields = {
   name: "",
   organization: "",
   email: "",
-  interest: "The whole practice",
+  interest: inquiryInterests[0],
   note: "",
 };
 
 const DRAFT_KEY = "nexus-inquiry-draft";
 
-const interests = ["The whole practice", ...products.map((product) => product.name)];
-
-function validate(fields: Fields): Errors {
-  const errors: Errors = {};
-  if (fields.name.trim().length < 2) errors.name = "Tell us who to reply to.";
-  if (fields.organization.trim().length < 2) errors.organization = "Which place or organization?";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email.trim())) {
-    errors.email = "Use an email we can actually answer.";
-  }
-  if (fields.note.trim().length < 12) {
-    errors.note = "A sentence is enough — what should get healthier or cleaner?";
-  }
-  return errors;
-}
-
 const fieldClass = cn(
   "mt-2 w-full border border-line bg-foam px-3 py-3 text-ink outline-none",
+  "disabled:cursor-not-allowed disabled:opacity-70",
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-leaf",
 );
 
+function savedDetail(sent: Saved): string {
+  if (sent.notify === "sent") {
+    return `The partnerships desk has a copy, and a reply can come to ${sent.email}.`;
+  }
+  if (sent.notify === "failed") {
+    return `We could not send the partnerships inbox a copy, but your note is on file. A reply can still come to ${sent.email}.`;
+  }
+  return `We have your note, and a reply can come to ${sent.email}.`;
+}
+
 export function Inquiry() {
   const [fields, setFields] = useState<Fields>(empty);
-  const [errors, setErrors] = useState<Errors>({});
-  const [sent, setSent] = useState<Fields | null>(null);
+  const [errors, setErrors] = useState<InquiryFieldErrors>({});
+  const [formError, setFormError] = useState<string | null>(null);
+  const [status, setStatus] = useState<"editing" | "submitting">("editing");
+  const [sent, setSent] = useState<Saved | null>(null);
 
   useEffect(() => {
     try {
@@ -67,21 +74,38 @@ export function Inquiry() {
     setFields((current) => ({ ...current, [key]: value }));
   }
 
-  function onSubmit(event: FormEvent) {
+  async function onSubmit(event: FormEvent) {
     event.preventDefault();
-    const next = validate(fields);
-    setErrors(next);
-    if (Object.keys(next).length > 0) return;
-    const snapshot = {
-      ...fields,
-      name: fields.name.trim(),
-      organization: fields.organization.trim(),
-      email: fields.email.trim(),
-      note: fields.note.trim(),
-    };
-    setSent(snapshot);
-    localStorage.removeItem(DRAFT_KEY);
+    if (status === "submitting") return;
+
+    const parsed = inquirySchema.safeParse(fields);
+    if (!parsed.success) {
+      setErrors(fieldErrorsFromZod(parsed.error));
+      setFormError(null);
+      return;
+    }
+
+    setErrors({});
+    setFormError(null);
+    setStatus("submitting");
+    try {
+      const result = await submitInquiry({ data: parsed.data });
+      if (!result.ok) {
+        setErrors(result.fieldErrors ?? {});
+        setFormError(result.message);
+        setStatus("editing");
+        return;
+      }
+      localStorage.removeItem(DRAFT_KEY);
+      setSent({ ...parsed.data, id: result.id, notify: result.notify });
+      setStatus("editing");
+    } catch {
+      setFormError(INQUIRY_SAVE_ERROR);
+      setStatus("editing");
+    }
   }
+
+  const busy = status === "submitting";
 
   return (
     <section id="talk" className="scroll-mt-24 bg-ink text-paper">
@@ -92,14 +116,14 @@ export function Inquiry() {
             Tell us the place you want to leave healthier.
           </h2>
           <p className="mt-4 text-paper/75">
-            A school, a clinic, a campus, a block. Bring the problem in physical terms — the air, the
-            missed visits, the peak, the leak. We will answer in those terms.
+            A school, a clinic, a campus, a block. Bring the problem in physical terms — the air,
+            the missed visits, the peak, the leak. We will answer in those terms.
           </p>
         </div>
 
         <div className="lg:col-span-7">
           {sent ? (
-            <div className="border border-paper/20 bg-ink p-6 sm:p-8">
+            <div className="border border-paper/20 bg-ink p-6 sm:p-8" role="status">
               <p className="text-xs tracking-widest text-honey uppercase">Noted</p>
               <h3 className="mt-3 font-serif text-3xl font-medium">
                 {sent.name}, we have your note from {sent.organization}.
@@ -111,8 +135,7 @@ export function Inquiry() {
                 {sent.note}
               </blockquote>
               <p className="mt-6 text-sm text-paper/70">
-                This preview keeps nothing on a server. On a live Nexus desk, the note would go to the
-                partnerships team — still answered as a place, not a lead score.
+                Reference {sent.id}. {savedDetail(sent)}
               </p>
               <button
                 type="button"
@@ -124,13 +147,15 @@ export function Inquiry() {
                 onClick={() => {
                   setSent(null);
                   setFields(empty);
+                  setErrors({});
+                  setFormError(null);
                 }}
               >
                 Write another note
               </button>
             </div>
           ) : (
-            <form onSubmit={onSubmit} noValidate className="grid gap-5">
+            <form onSubmit={onSubmit} noValidate className="grid gap-5" aria-busy={busy}>
               <div className="grid gap-5 sm:grid-cols-2">
                 <label className="text-sm">
                   Name
@@ -138,6 +163,8 @@ export function Inquiry() {
                     className={fieldClass}
                     value={fields.name}
                     autoComplete="name"
+                    maxLength={120}
+                    disabled={busy}
                     aria-invalid={Boolean(errors.name)}
                     onChange={(event) => update("name", event.target.value)}
                   />
@@ -153,6 +180,8 @@ export function Inquiry() {
                     className={fieldClass}
                     value={fields.organization}
                     autoComplete="organization"
+                    maxLength={160}
+                    disabled={busy}
                     aria-invalid={Boolean(errors.organization)}
                     onChange={(event) => update("organization", event.target.value)}
                   />
@@ -171,6 +200,8 @@ export function Inquiry() {
                     type="email"
                     value={fields.email}
                     autoComplete="email"
+                    maxLength={254}
+                    disabled={busy}
                     aria-invalid={Boolean(errors.email)}
                     onChange={(event) => update("email", event.target.value)}
                   />
@@ -185,14 +216,21 @@ export function Inquiry() {
                   <select
                     className={fieldClass}
                     value={fields.interest}
+                    disabled={busy}
+                    aria-invalid={Boolean(errors.interest)}
                     onChange={(event) => update("interest", event.target.value)}
                   >
-                    {interests.map((interest) => (
+                    {inquiryInterests.map((interest) => (
                       <option key={interest} value={interest}>
                         {interest}
                       </option>
                     ))}
                   </select>
+                  {errors.interest ? (
+                    <span className="mt-1 block text-honey" role="alert">
+                      {errors.interest}
+                    </span>
+                  ) : null}
                 </label>
               </div>
               <label className="text-sm">
@@ -200,6 +238,8 @@ export function Inquiry() {
                 <textarea
                   className={cn(fieldClass, "min-h-32 resize-y")}
                   value={fields.note}
+                  maxLength={4000}
+                  disabled={busy}
                   aria-invalid={Boolean(errors.note)}
                   onChange={(event) => update("note", event.target.value)}
                 />
@@ -209,16 +249,26 @@ export function Inquiry() {
                   </span>
                 ) : null}
               </label>
+              {formError ? (
+                <p
+                  role="alert"
+                  className="border border-honey/40 bg-honey/10 px-4 py-3 text-sm text-honey"
+                >
+                  {formError}
+                </p>
+              ) : null}
               <div>
                 <button
                   type="submit"
+                  disabled={busy}
                   className={cn(
                     "min-h-11 bg-paper px-5 text-sm font-medium text-ink transition-colors duration-200 hover:bg-leaf-soft active:scale-[0.96]",
+                    "disabled:cursor-not-allowed disabled:opacity-70 disabled:active:scale-100",
                     focusRing,
                     "focus-visible:outline-paper",
                   )}
                 >
-                  Send the note
+                  {busy ? "Sending the note" : "Send the note"}
                 </button>
               </div>
             </form>
