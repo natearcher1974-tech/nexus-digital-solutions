@@ -16,7 +16,7 @@ function BuyPack({ id, describedBy }: { id: string; describedBy: string }) {
       href={promptforgeCheckoutUrl()}
       aria-describedby={describedBy}
       className={cn(
-        "inline-flex min-h-11 items-center justify-center bg-ink px-5 text-sm font-medium text-paper",
+        "inline-flex min-h-11 w-full items-center justify-center bg-ink px-5 text-sm font-medium text-paper sm:w-auto",
         "transition-colors duration-200 hover:bg-leaf active:scale-[0.96]",
         focusRing,
       )}
@@ -176,9 +176,12 @@ export function PromptforgePage() {
       <main id="main">
         <section className="mx-auto max-w-7xl px-5 pt-10 pb-16 sm:px-8 sm:pt-16 sm:pb-24">
           <div className="grid gap-8 lg:grid-cols-12 lg:gap-12">
-            <p className="text-xs font-medium tracking-widest text-leaf uppercase lg:col-span-8">
+            <p className="text-xs font-medium tracking-widest text-leaf uppercase lg:col-span-8 lg:col-start-1 lg:row-start-1">
               PromptForge AI · A Nexus field kit
             </p>
+            <h1 className="font-serif text-4xl leading-none font-medium sm:text-6xl lg:col-span-8 lg:col-start-1 lg:row-start-2">
+              Leave class with the words that get a stranger to pay you.
+            </h1>
             <div className="border border-line bg-foam p-6 sm:p-8 lg:col-span-4 lg:col-start-9 lg:row-span-3 lg:row-start-1">
               <p className="font-serif text-5xl leading-none font-medium">$29</p>
               <p className="mt-2 text-xs tracking-widest text-muted uppercase">
@@ -192,10 +195,7 @@ export function PromptforgePage() {
                 receipt and the $29 comes back.
               </p>
             </div>
-            <h1 className="font-serif text-4xl leading-none font-medium sm:text-6xl lg:col-span-8">
-              Leave class with the words that get a stranger to pay you.
-            </h1>
-            <div className="lg:col-span-8">
+            <div className="lg:col-span-8 lg:col-start-1 lg:row-start-3">
               <p className="max-w-xl text-base leading-relaxed text-muted sm:text-lg">
                 {promptCount} prompts for the part of a company that is not a pitch deck. Find the
                 buyer, ask for the sale, publish something true, and run the week you actually have.
