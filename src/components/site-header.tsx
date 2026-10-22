@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { nav } from "@/data/site";
+import { useRouterState } from "@tanstack/react-router";
+import { nav, resolveNavHref } from "@/data/site";
 import { cn, focusRing } from "@/lib/cn";
 
 function Mark({ className }: { className?: string }) {
@@ -20,6 +21,7 @@ function Mark({ className }: { className?: string }) {
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -54,24 +56,35 @@ export function SiteHeader() {
         Skip to content
       </a>
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 sm:px-8">
-        <a href="#top" className={cn("flex items-center gap-2.5 text-ink", focusRing)}>
+        <a
+          href={pathname === "/" ? "#top" : "/"}
+          className={cn("flex items-center gap-2.5 text-ink", focusRing)}
+        >
           <Mark className="size-7" />
           <span className="text-sm font-medium tracking-wide">Nexus</span>
         </a>
-        <nav className="hidden items-center gap-7 lg:flex" aria-label="Primary">
-          {nav.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className={cn("text-sm text-muted transition-colors duration-200 hover:text-ink", focusRing)}
-            >
-              {item.label}
-            </a>
-          ))}
+        <nav className="hidden items-center gap-5 lg:flex" aria-label="Primary">
+          {nav.map((item) => {
+            const current = item.href === "/promptforge" && pathname === "/promptforge";
+            return (
+              <a
+                key={item.href}
+                href={resolveNavHref(item.href, pathname)}
+                aria-current={current ? "page" : undefined}
+                className={cn(
+                  "text-sm transition-colors duration-200 hover:text-ink",
+                  current ? "text-ink" : "text-muted",
+                  focusRing,
+                )}
+              >
+                {item.label}
+              </a>
+            );
+          })}
         </nav>
         <div className="flex items-center gap-2">
           <a
-            href="#talk"
+            href={resolveNavHref("/#talk", pathname)}
             className={cn(
               "inline-flex min-h-11 items-center bg-ink px-4 text-sm font-medium text-paper transition-colors duration-200 hover:bg-leaf active:scale-[0.96]",
               focusRing,
@@ -98,16 +111,20 @@ export function SiteHeader() {
         className={cn("border-t border-line lg:hidden", open ? "block" : "hidden")}
       >
         <nav className="mx-auto flex max-w-7xl flex-col px-5 py-2 sm:px-8" aria-label="Mobile">
-          {nav.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className={cn("min-h-11 py-3 text-base", focusRing)}
-              onClick={() => setOpen(false)}
-            >
-              {item.label}
-            </a>
-          ))}
+          {nav.map((item) => {
+            const current = item.href === "/promptforge" && pathname === "/promptforge";
+            return (
+              <a
+                key={item.href}
+                href={resolveNavHref(item.href, pathname)}
+                aria-current={current ? "page" : undefined}
+                className={cn("min-h-11 py-3 text-base", current && "font-medium", focusRing)}
+                onClick={() => setOpen(false)}
+              >
+                {item.label}
+              </a>
+            );
+          })}
         </nav>
       </div>
     </header>
