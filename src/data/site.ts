@@ -233,9 +233,16 @@ export const notes = [
 ];
 
 export const nav = [
-  { href: "#thesis", label: "Thesis" },
-  { href: "#products", label: "Products" },
-  { href: "#impact", label: "Impact" },
-  { href: "#method", label: "Method" },
-  { href: "#notes", label: "Notes" },
+  { href: "/#thesis", label: "Thesis" },
+  { href: "/#products", label: "Products" },
+  { href: "/promptforge", label: "PromptForge" },
+  { href: "/#impact", label: "Impact" },
+  { href: "/#method", label: "Method" },
+  { href: "/#notes", label: "Notes" },
 ];
+
+/** Hash links stay on the home page; from anywhere else they point back at it. */
+export function resolveNavHref(href: string, pathname: string): string {
+  if (pathname === "/" && href.startsWith("/#")) return href.slice(1);
+  return href;
+}

@@ -20,7 +20,8 @@ export function Products() {
     if (!keys.includes(event.key)) return;
     event.preventDefault();
     let next = index;
-    if (event.key === "ArrowDown" || event.key === "ArrowRight") next = (index + 1) % products.length;
+    if (event.key === "ArrowDown" || event.key === "ArrowRight")
+      next = (index + 1) % products.length;
     if (event.key === "ArrowUp" || event.key === "ArrowLeft")
       next = (index - 1 + products.length) % products.length;
     if (event.key === "Home") next = 0;
@@ -39,8 +40,8 @@ export function Products() {
             Four systems. One acceptance test.
           </h2>
           <p className="mt-4 text-muted sm:text-lg">
-            Did the place get healthier, cleaner, or kinder to live in? If not, the software does not
-            ship as a success.
+            Did the place get healthier, cleaner, or kinder to live in? If not, the software does
+            not ship as a success.
           </p>
         </div>
 
@@ -133,6 +134,31 @@ export function Products() {
             </dl>
           </div>
         </div>
+
+        <aside className="mt-16 border-t border-line pt-10">
+          <p className="text-xs font-medium tracking-widest text-muted uppercase">
+            Also from the desk
+          </p>
+          <div className="mt-4 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+            <div className="max-w-xl">
+              <h3 className="font-serif text-3xl font-medium">PromptForge AI</h3>
+              <p className="mt-3 text-muted">
+                Fifty-six prompts for student founders — leads, sales, content, and the week itself.
+                $29 once. A quarter of the profit goes to Charleston waterways.
+              </p>
+            </div>
+            <a
+              href="/promptforge"
+              className={cn(
+                "inline-flex min-h-11 items-center border border-ink px-5 text-sm font-medium",
+                "transition-colors duration-200 hover:bg-ink hover:text-paper active:scale-[0.96]",
+                focusRing,
+              )}
+            >
+              Read the pack
+            </a>
+          </div>
+        </aside>
       </div>
     </section>
   );

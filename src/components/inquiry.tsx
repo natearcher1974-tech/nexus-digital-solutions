@@ -22,7 +22,11 @@ const empty: Fields = {
 
 const DRAFT_KEY = "nexus-inquiry-draft";
 
-const interests = ["The whole practice", ...products.map((product) => product.name)];
+const interests = [
+  "The whole practice",
+  ...products.map((product) => product.name),
+  "PromptForge AI",
+];
 
 function validate(fields: Fields): Errors {
   const errors: Errors = {};
@@ -92,8 +96,8 @@ export function Inquiry() {
             Tell us the place you want to leave healthier.
           </h2>
           <p className="mt-4 text-paper/75">
-            A school, a clinic, a campus, a block. Bring the problem in physical terms — the air, the
-            missed visits, the peak, the leak. We will answer in those terms.
+            A school, a clinic, a campus, a block. Bring the problem in physical terms — the air,
+            the missed visits, the peak, the leak. We will answer in those terms.
           </p>
         </div>
 
@@ -111,8 +115,8 @@ export function Inquiry() {
                 {sent.note}
               </blockquote>
               <p className="mt-6 text-sm text-paper/70">
-                This preview keeps nothing on a server. On a live Nexus desk, the note would go to the
-                partnerships team — still answered as a place, not a lead score.
+                This preview keeps nothing on a server. On a live Nexus desk, the note would go to
+                the partnerships team — still answered as a place, not a lead score.
               </p>
               <button
                 type="button"
