@@ -1,9 +1,12 @@
-const DEFAULT_CHECKOUT_URL = "https://buy.stripe.com/test_3cI8wRagZcg2eHJgwyco000";
+export const PROMPTFORGE_CHECKOUT_URL = "https://natearcher6.gumroad.com/l/unapbj";
+export const PROMPTFORGE_PRO_CHECKOUT_URL = "https://natearcher6.gumroad.com/l/pscau";
 
-/** Stripe Payment Link. Override with VITE_PROMPTFORGE_CHECKOUT_URL. */
+/** Gumroad checkout for the $29 pack. */
 export function promptforgeCheckoutUrl(): string {
-  const raw = import.meta.env.VITE_PROMPTFORGE_CHECKOUT_URL as string | undefined;
-  const trimmed = raw?.trim() ?? "";
-  if (trimmed.startsWith("https://")) return trimmed;
-  return DEFAULT_CHECKOUT_URL;
+  return PROMPTFORGE_CHECKOUT_URL;
+}
+
+/** Gumroad checkout for the $79 Pro bundle. */
+export function promptforgeProCheckoutUrl(): string {
+  return PROMPTFORGE_PRO_CHECKOUT_URL;
 }
