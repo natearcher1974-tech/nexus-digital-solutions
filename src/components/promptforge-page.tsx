@@ -3,7 +3,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { categories, faqs, promptCount, samples, type PromptSample } from "@/data/promptforge";
 import { claimSample } from "@/lib/promptforge/claim-sample";
-import { promptforgeCheckoutUrl } from "@/lib/promptforge/checkout";
+import { promptforgeCheckoutUrl, promptforgeProCheckoutUrl } from "@/lib/promptforge/checkout";
 import type { SampleClaim } from "@/lib/promptforge/types";
 import { cn, focusRing } from "@/lib/cn";
 
@@ -21,7 +21,22 @@ function BuyPack({ id, describedBy }: { id: string; describedBy: string }) {
         focusRing,
       )}
     >
-      Buy the pack
+      Buy the pack — $29
+    </a>
+  );
+}
+
+function BuyPro() {
+  return (
+    <a
+      href={promptforgeProCheckoutUrl()}
+      className={cn(
+        "mt-3 inline-flex min-h-11 w-full items-center justify-center border border-ink sm:mt-0 sm:ml-3 px-5 text-sm font-medium text-ink sm:w-auto",
+        "transition-colors duration-200 hover:bg-foam active:scale-[0.96]",
+        focusRing,
+      )}
+    >
+      Get Pro — $79
     </a>
   );
 }
@@ -189,9 +204,10 @@ export function PromptforgePage() {
               </p>
               <div className="mt-6">
                 <BuyPack id="buy-pack" describedBy="money-back" />
+                <BuyPro />
               </div>
               <p id="money-back" className="mt-4 text-sm leading-relaxed text-ink">
-                30-day money-back guarantee. If the pack does not earn its keep, reply to the Stripe
+                30-day money-back guarantee. If the pack does not earn its keep, reply to the Gumroad
                 receipt and the $29 comes back.
               </p>
             </div>
@@ -357,6 +373,7 @@ export function PromptforgePage() {
               </p>
             </div>
             <BuyPack id="buy-pack-close" describedBy="money-back-close" />
+            <BuyPro />
           </div>
         </section>
       </main>
