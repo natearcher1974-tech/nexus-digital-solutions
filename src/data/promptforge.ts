@@ -154,11 +154,11 @@ export const faqs = [
   },
   {
     q: "When do I get the file?",
-    a: "You pay once on Stripe. The file is delivered with the purchase. It is not posted as a public download on this site — the pack stays off the page until payment, and fulfillment is tied to checkout rather than a link here.",
+    a: "You pay once on Gumroad. The file is delivered with the purchase. It is not posted as a public download on this site — the pack stays off the page until payment, and fulfillment is tied to checkout rather than a link here.",
   },
   {
     q: "What if I want my money back?",
-    a: "Thirty days. If the pack does not earn its keep, reply to your Stripe receipt and we return the $29. You do not need to write an essay. The sample prompt you traded for an email is yours either way.",
+    a: "Thirty days. If the pack does not earn its keep, reply to your Gumroad receipt and we return the $29. You do not need to write an essay. The sample prompt you traded for an email is yours either way.",
   },
   {
     q: "Who is it for?",
