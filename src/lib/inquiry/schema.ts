@@ -4,6 +4,7 @@ import { products } from "../../data/site.ts";
 export const inquiryInterests = [
   "The whole practice",
   ...products.map((product) => product.name),
+  "PromptForge AI",
 ] as const;
 
 const inquiryFieldNames = ["name", "organization", "email", "interest", "note"] as const;

@@ -3,19 +3,11 @@ import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import appCss from "../styles.css?url";
 
-const APP_NAME = "Nexus Digital Solutions";
-
 export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: APP_NAME },
-      {
-        name: "description",
-        content:
-          "Nexus Digital Solutions builds AI so the world is healthier and cleaner — air, care, energy, and water, in service of a superior quality of life.",
-      },
       { name: "theme-color", content: "#f3efe6" },
     ],
     links: [

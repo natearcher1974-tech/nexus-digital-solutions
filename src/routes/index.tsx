@@ -10,6 +10,16 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Nexus Digital Solutions" },
+      {
+        name: "description",
+        content:
+          "Nexus Digital Solutions builds AI so the world is healthier and cleaner — air, care, energy, and water, in service of a superior quality of life.",
+      },
+    ],
+  }),
   component: Home,
 });
 
